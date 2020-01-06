@@ -1,5 +1,5 @@
 " Run code block and echo results
-function! MarkdownRunner() abort
+function! markdown_runner#Echo() abort
   try
     let runner = s:RunCodeBlock()
     echo runner.result
@@ -7,16 +7,15 @@ function! MarkdownRunner() abort
     call s:error(v:exception)
   endtry
 endfunction
-command! MarkdownRunner call MarkdownRunner()
 
-" Run code block and insert results into buffer.
+" Run code block and insert results into buffer.{{{
 " IF there is a fenced code block with language 'markdown-runner' below the
 " current code block it will be replaced with the new results.
-function! MarkdownRunnerInsert() abort
+function! markdown_runner#Insert() abort
   try
     let runner = s:RunCodeBlock()
-
-    " Remove existing results if present
+"}}}
+    " Remove existing results if present{{{
     if getline(runner.end + 2) ==# '```markdown-runner'
       let save_cursor = getcurpos()
       call cursor(runner.end + 3, 0)
@@ -30,7 +29,7 @@ function! MarkdownRunnerInsert() abort
       endif
       call setpos('.', save_cursor)
     endif
-    
+    "}}}
     " Insert new results
     let result_lines = split(runner.result, '\n')
     call append(runner.end, '')
@@ -41,7 +40,6 @@ function! MarkdownRunnerInsert() abort
     call s:error(v:exception)
   endtry
 endfunction
-command! MarkdownRunnerInsert call MarkdownRunnerInsert()
 
 function! s:error(error)
   execute 'normal! \<Esc>'
@@ -121,7 +119,7 @@ endfunction
 
 " Language specific runners
 
-function! s:RunGoBlock(src) abort
+function! markdown_runner#RunGoBlock(src) abort
   let tmp = tempname() . ".go"
   let src = a:src
 
@@ -143,19 +141,10 @@ function! s:RunGoBlock(src) abort
   return res
 endfunction
 
-function! s:RunVimBlock(src) abort
+function! markdown_runner#RunVimBlock(src) abort
   let tmp = tempname() . ".vim"
   call writefile(a:src, tmp)
   execute "source " . tmp
   call delete(tmp)
   return ""
 endfunction
-
-let g:markdown_runners = {
-      \ '': getenv('SHELL'),
-      \ 'go': function("s:RunGoBlock"),
-      \ 'js': 'node',
-      \ 'javascript': 'node',
-      \ 'vim': function("s:RunVimBlock"),
-      \ }
-let g:markdown_runner_populate_location_list = 0
