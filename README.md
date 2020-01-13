@@ -6,7 +6,7 @@ Make your markdown interactive!
 
 ## Installation
 
-Use your preferred package management tool, for vim-plugged:
+Use your preferred package management tool, for vim-plug:
 
 ```vim
 Plug 'dbridges/vim-markdown-runner'
