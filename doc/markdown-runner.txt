@@ -1,0 +1,140 @@
+*markdown-runner* Make your markdown interactive!
+
+Author:  Dan Bridges <dan@danbridges.org>
+License: Same terms as Vim itself (see |license|)
+
+==============================================================================
+Contents                                            *markdown-runner-contents*
+
+  1. Intro......................................|markdown-runner-intro|
+  2. Commands...................................|markdown-runner-commands|
+  3. Options....................................|markdown-runner-options|
+  4. Builtin Language Runners...................|markdown-runner-languages|
+    1. Go.......................................|markdown-runner-go|
+    2. Javascript...............................|markdown-runner-javascript|
+    3. Vimscript................................|markdown-runner-vimscript|
+  5. Changelog..................................|markdown-runner-changelog|
+  6. Contributing...............................|markdown-runner-contributing|
+
+==============================================================================
+INTRO                                                  *markdown-runner-intro*
+
+Markdown Runner makes it easy to run code snippets contained in fenced code
+blocks within a markdown file.
+
+```python
+print("Hello Markdown Runner")
+```
+
+Place your cursor in the line containing "print" above and execute
+|:MarkdownRunner|. The results of running the code block will be printed to the
+screen.
+
+==============================================================================
+COMMANDS                                            *markdown-runner-commands*
+
+:MarkdownRunner                                              *:MarkdownRunner*
+
+    Run the fenced code block at cursor and echo the results.
+
+    |MarkdownRunner| passes the code contained in the block to the specified
+    language runner through stdin. By default the runner command is the same
+    as the specified language, so
+
+        ```python
+        print("Hello World")|
+        ```                 ^
+                            cursor
+    
+    will run with `python`.
+
+    If no source language is specified it will use `$SHELL` as the run
+    command.
+
+:MarkdownRunnerInsert                                 *:MarkdownRunnerInsert*
+  
+    Like |MarkdownRunner| but inserts the results into the document directly
+    below the current codeblock. The inserted results will be a new fenced
+    code block specified with language `markdown-runner`.
+
+    If there is already an existing code block immediately below tagged with
+    language `markdown-runner` it will be replaced with the new results.
+
+
+==============================================================================
+OPTIONS                                              *markdown-runner-options*
+
+                                                          *g:markdown-runners*
+You can overwrite or specify new commands by updating the |g:markdown_runners|
+dictionary. Set the value to a string or a |Funcref|. If the value is a string
+that command will be directly executed, piping the contents of the block to
+its stdin. If that value is a |Funcref| that function will be called. The
+specified function should receive a list of strings, representing each line of
+the current code block, and return a single string with the results.
+
+    let g:markdown_runners['python'] = 'python3'
+    
+    function! MyRustRunner(src)
+      "a:src is a list of lines representing the current code block
+      "...do your custom processing here
+      return "Results"
+    endfunction
+    
+    let g:markdown_runners['rust'] = function('MyRustRunner')
+
+                                                          *b:markdown-runners*
+Like |g:markdown-runners| but sets runners for a specific buffer.
+
+    let b:markdown_runners = {'python': 'python3'}
+
+                                    *g:markdown_runner_populate_location_list*
+Set to 1 to always populate the location list with the results. Default 0.
+
+==============================================================================
+LANGUAGE RUNNERS                                   *markdown-runner-languages*
+
+Markdown Runner includes builtin customizations for a variety of languages:
+
+------------------------------------------------------------------------------
+GO                                                        *markdown-runner-go*
+
+The Go runner will attempt to handle a variety of code blocks by (i) adding a
+default package declaration if one does not already exist, (ii) wrapping the
+entire code block in a `main` function, if `main` is not already defined, and
+(iii) running `goimports` on the final result. This lets you easily run code
+blocks without adding extra boilerplate, like this one in
+`net/http`` (https://golang.org/pkg/net/http/):
+
+    ```go
+    resp, err := http.Get("http://example.com/")
+    if err != nil {
+      // handle error
+    }
+    defer resp.Body.Close()
+    body, err := ioutil.ReadAll(resp.Body)
+    fmt.Println(string(body))
+    ```
+
+------------------------------------------------------------------------------
+JAVASCRIPT                                        *markdown-runner-javascript*
+
+js and javascript code blocks will be run with node.
+
+------------------------------------------------------------------------------
+VIMSCRIPT                                          *markdown-runner-vimscript*
+
+Vimscript code blocks will be directly sourced.
+
+==============================================================================
+CHANGELOG                                          *markdown-runner-changelog*
+
+01/13/2020~
+    First release.
+
+==============================================================================
+CONTRIBUTING                                    *markdown-runner-contributing*
+
+To report an issue or contribute a pull request, please visit the project
+home page: https://github.com/dbridges/vim-markdown-runner
+
+vim: ft=help tw=78 et ts=8 sw=8 sts=8 norl
