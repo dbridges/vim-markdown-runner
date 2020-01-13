@@ -22,6 +22,12 @@ autocmd FileType markdown nnoremap <buffer> <Leader>r :MarkdownRunner<CR>
 autocmd FileType markdown nnoremap <buffer> <Leader>R :MarkdownRunnerInsert<CR>
 ```
 
+For full documentation:
+
+```
+:h markdown-runner
+```
+
 ## Code Type Customization
 
 `MarkdownRunner` passes the code contained in the block to the specified language runner through stdin. By default the runner command is the same as the specified language, so
