@@ -51,6 +51,11 @@ endfunction
 function! s:RunCodeBlock() abort
   let runner = s:ParseCodeBlock()
   let Runner = s:RunnerForLanguage(runner.language)
+
+  let $markdown_runner__embedding_file = expand('%:p')
+  let cursorpos = getcurpos()
+  let $markdown_runner__line = cursorpos[1]
+
   if type(Runner) == v:t_func
     let result = Runner(runner.src)
   elseif type(Runner) == v:t_string
